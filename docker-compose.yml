@@ -1,0 +1,30 @@
+version: "3.7"
+services:
+  server:
+    container_name: server
+    restart: always
+    volumes:
+    - ./logs/vas-logs:/home/app/logs
+    - ./server/server.config.js:/home/app/server.config.js:ro
+    - ./server/index.js:/home/app/index.js:ro
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+    - 3000:3000
+    image: server
+    depends_on:
+    - mongodb
+  mongodb:
+    container_name: mongodb
+    image: mongo:latest
+    restart: always
+    environment:
+    - MONGO_DATA_DIR=/data/db
+    - MONGO_LOG_DIR=/data/log
+    volumes:
+    - ./db:/data/db
+    - ./logs/mongo:/data/log/
+    # ports:
+    # - 27017:27017
+    command: mongod --logpath /data/log/mongodb.log
