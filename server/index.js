@@ -11,8 +11,9 @@ var app = express();
 
 // Endpoints
 app.get('/', (req, res) => res.send('Welcome to cyberlab server!'));
-app.post('/image', function(req, res){
-  res.send('Under construction...')
+app.post('/', function(req, res){
+  var body = req.body;
+  res.json({error: 'false', msg: 'We got your message', payload: body});
 })
 
 // CONNECTING to MONGO
