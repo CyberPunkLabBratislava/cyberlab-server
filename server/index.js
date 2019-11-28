@@ -20,14 +20,12 @@ var app = express();
 app.use(cors({origin:'*'}))
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(express.static('public'));
-app.use(bodyParser.json());
 
 // Mongo Models
 var Schema = mongoose.Schema;
 var picture = new Schema({
     date: { type: Date, default: Date.now },
-    image: { data: Buffer, contentType: String, size: String }
+    image: { data: Buffer, contentType: String, size: Number }
 });
 var pictureModel = mongoose.model('picture', picture);
 
@@ -38,32 +36,65 @@ app.post('/', function(req, res){
   var body = req.body;
   res.json({error: 'false', msg: 'We got your message', payload: body});
 })
-app.post('/image', upload.single('picture'), function(req, res){
+app.post('/form', upload.single('picture'), function(req, res){
   if(req.file){
     // read the img file from tmp in-memory location
     var newImg = fs.readFileSync(req.file.path);
     // encode the file as a base64 string.
     var encImg = newImg.toString('base64');
-    // define your new document
-    var newItem = {
-       // description: req.body.description,
-       contentType: req.file.mimetype,
-       size: req.file.size,
-       data: Buffer(encImg, 'base64')
-    };
-    var pictureDb = new pictureModel({image: newItem});
-    pictureDb.save()
+    // Call Mongo
+    storeImage(encImg, req.file.size, req.file.mimetype)
     .then(function(response){
       res.json({error: false, msg: "Image received", desc: req.file});
     })
     .catch(function(err){
       console.log(err);
-      res.json({error: true, msg: "Error storing image...", desc: err});
+      res.json({error: true, msg: "Error storing image..."});
     });
   } else {
     res.json({error: true, msg: "Missing image..."});
   }
 })
+app.post('/image', function(req, res){
+  //*** Store as file ***
+  // var f = fs.createWriteStream('uploads/out.jpeg');
+  // req.on('data', function (data) {
+  //     f.write(data);
+  // });
+  // req.on('end', function () {
+  //     f.end();
+  // });
+  //*** Store in Mongo ***
+  let body = [];
+  req.on('data', (chunk) => {
+    body.push(chunk);
+  }).on('end', () => {
+    body = Buffer.concat(body).toString('base64');
+    storeImage(body, Buffer.byteLength(body), "image/jpeg")
+    .then(function(response){
+      console.log("Image stored!");
+      res.end("Image received");
+    })
+    .catch(function(err){
+      console.log(err);
+      res.end("Something went wrong...");
+    });
+  });
+})
+
+// OTHER FUNCTIONS
+// Store image
+function storeImage(payload, size, mimetype){
+  // define your new document
+  var newItem = {
+     // description: req.body.description,
+     contentType: mimetype,
+     size: size,
+     data: Buffer(payload, 'base64')
+  };
+  var pictureDb = new pictureModel({image: newItem});
+  return pictureDb.save();
+}
 
 // CONNECTING to MONGO
 var conn_attempts = 1;
