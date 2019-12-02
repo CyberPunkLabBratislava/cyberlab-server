@@ -81,6 +81,17 @@ app.post('/image', function(req, res){
     });
   });
 })
+app.get('/image', function(req, res){
+  pictureModel.findOne({},{"image.data": 1}).sort({_id:-1}).limit(1)
+  .then(function(response){
+    var img = respose.image.data;
+    res.end(img);
+  })
+  .catch(function(err){
+    console.log(err);
+    res.end("Something went wrong...");
+  });
+})
 
 // OTHER FUNCTIONS
 // Store image
