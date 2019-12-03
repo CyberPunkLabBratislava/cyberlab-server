@@ -1,13 +1,8 @@
 {
-  "name": "Cyberlab server",
-  "version": "1.0.0",
-  "description": "NodeJS API CoachDb Express Images",
+  "name": "cyberlabserver",
+  "version": "1.0.1",
+  "description": "Server for cyberlab projects",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "J. Almela",
-  "license": "MIT",
   "dependencies": {
     "body-parser": "^1.19.0",
     "cookie-parser": "^1.4.4",
@@ -16,5 +11,11 @@
     "http": "0.0.0",
     "morgan": "^1.9.1",
     "winston": "^3.2.1"
-  }
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "J. Almela",
+  "license": "MIT"
 }

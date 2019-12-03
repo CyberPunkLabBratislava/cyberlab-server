@@ -34,7 +34,7 @@ app.use(morgan(':status - :date[iso] - :method - :url - :response-time - :remote
 app.use('/', welcome);
 app.use('/image', images);
 
-  // Not found request response
+// Not found request response
 app.use(function(req, res) {
   res.status(404).send({url: req.originalUrl + ' not found'});
 });
@@ -43,7 +43,7 @@ app.use(function(req, res) {
 
 // Start server
 var server = http.createServer(app);
-server.listen(config.port, () => console.log("Server listening on port " + config.port));
+server.listen(3000, () => console.log("Server listening on port " ));
 
 // Export app module
 module.exports = app;

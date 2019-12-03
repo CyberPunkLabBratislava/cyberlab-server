@@ -1,6 +1,6 @@
 module.exports = {
   apps: [{
-    name: "vas_monitor",
+    name: "cyberlabserver",
     script: "./index.js",
     output: './logs/out.log',
     error: './logs/error.log',
