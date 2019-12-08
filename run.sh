@@ -1,4 +1,5 @@
-mkdir -p logs
+mkdir -p logs/server
+mkdir -p logs/mongo
 chmod -R 777 logs
 docker kill server
 docker rm server

@@ -11,8 +11,10 @@ ENV HOME=/home/app/
 WORKDIR $HOME
 
 # Bundle APP files
-COPY server/ .
-RUN chown -R app:app /home/app/
+COPY server .
+RUN chown -R app:app /home/app/ && \
+    mkdir /home/app/logs && \
+    chmod -R 777 /home/app/logs
 
 USER app
 

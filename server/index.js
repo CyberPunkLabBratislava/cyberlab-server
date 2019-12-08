@@ -17,8 +17,7 @@ var morgan = require('morgan');
 var logger = require('./util/logger');
 
 // Load routes
-var welcome = require('./api/routes/welcome');
-var images = require('./api/routes/images');
+var api = require('./api/routes/routes');
 
 //** End imports **
 
@@ -32,8 +31,7 @@ app.use(cookieParser());
 app.use(morgan(':status - :date[iso] - :method - :url - :response-time - :remote-addr', { "stream": logger.stream}));
 
 //** API **
-app.use('/', welcome);
-app.use('/image', images);
+app.use('/', api);
 
 // Not found request response
 app.use(function(req, res) {
@@ -47,10 +45,10 @@ var conn_attempts = 1;
 var retryConnection = function(){
   conn_attempts++;
   logger.warn('Retrying connection to mongo...');
-  mongoConnect(config.mongoString, {useNewUrlParser: true});
+  mongoConnect(config.mongoString, {useNewUrlParser: true, useUnifiedTopology: true});
 };
 var mongoConnect = function(){
-  mongoose.connect(config.mongoString, {useNewUrlParser: true}, function(error){
+  mongoose.connect(config.mongoString, {useNewUrlParser: true, useUnifiedTopology: true}, function(error){
     if (error){
       if(conn_attempts > 5){
         logger.error("Couldn't connect to data source!" + error);

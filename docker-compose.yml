@@ -4,7 +4,7 @@ services:
     container_name: server
     restart: always
     volumes:
-    - ./logs/vas-logs:/home/app/logs
+    - ./logs/server:/home/app/logs
     - ./server/server.config.js:/home/app/server.config.js:ro
     - ./server/index.js:/home/app/index.js:ro
     build:
