@@ -8,6 +8,12 @@ exports.get = function (req, res, next) {
 
 exports.post = function (req, res, next) {
   sImages.saveImage(req)
-  .then((response)=>{res.json({error: false, size: response.size, id: response.id})})
+  .then((response)=>{res.json({error: false, id: response.id})})
+  .catch(()=>{res.json({error: true, message: 'Something went wrong, please check the logs for more info.'}) });  
+};
+
+exports.postform = function (req, res, next) {
+  sImages.saveImage_multer(req)
+  .then((response)=>{res.json({error: false, msg: "Nothing to say..."})})
   .catch(()=>{res.json({error: true, message: 'Something went wrong, please check the logs for more info.'}) });  
 };

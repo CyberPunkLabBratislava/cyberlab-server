@@ -4,7 +4,9 @@ var Schema = mongoose.Schema;
 var picture = new Schema({
     date: { type: Date, default: Date.now },
     origin: { type: String, default: 'UNKNOWN' },
-    image: { data: Buffer, contentType: String, size: Number }
+    path: { type: String, required: true },
+    contentType: { type: String, required: true },
+    size: { type: Number, required: true }
 });
 
 picture.set('autoIndex',true);

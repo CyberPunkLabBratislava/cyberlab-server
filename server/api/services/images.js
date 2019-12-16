@@ -9,29 +9,26 @@ var Log = require('../../classes/logger');
 exports.saveImage = function (req) {
   var logger = new Log();
   var userIP = req.socket.remoteAddress;
+  var size = req.headers['content-length'];
+  var mimeType = req.headers['content-type'];
   var timestamp = new Date().getTime();
- //*** Store as file ***
-  var f = fs.createWriteStream('uploads/' + userIP + '/' + timestamp + '.jpeg');
-  req.on('data', function (data) {
-      f.write(data);
-  });
-  req.on('end', function () {
+  var f = fs.createWriteStream('uploads/' + timestamp + '.jpeg');
+  return new Promise(function(resolve, reject) {
+    req.on('data', function (data) {
+        f.write(data);
+    });
+    req.on('end', function () {
       f.end();
-  });
-  //*** Store in Mongo ***
-  let body = [];
-  req.on('data', (chunk) => {
-    body.push(chunk);
-  }).on('end', () => {
-    body = Buffer.concat(body).toString('base64');
-    storeImage(userIP, body, Buffer.byteLength(body), "image/jpeg")
-    .then(function(response){
-      logger.info("Image stored by : " + userIP, "POST_IMAGE");
-      Promise.resolve({id: response._id,size: Buffer.byteLength(body)})
-    })
-    .catch(function(err){
-      logger.error(err, 'POST_IMAGE');
-      Promise.reject();
+      //*** Store Metadata in Mongo ***
+      storeMetadata(userIP, size, mimeType)
+      .then(function(response){
+        logger.info("Image stored by : " + userIP, "POST_IMAGE");
+        resolve({id: response._id})
+      })
+      .catch(function(err){
+        logger.error(err, 'POST_IMAGE');
+        reject();
+      });
     });
   });
 }
@@ -39,29 +36,45 @@ exports.saveImage = function (req) {
 exports.retrieveImage = function (req){
     var logger = new Log();
     var userIP = req.socket.remoteAddress;
-    pictureModel.findOne({},{"image.data": 1}).sort({_id:-1}).limit(1)
+    var images;
+    return new Promise(function(resolve, reject) {
+    pictureModel.find({}).sort({_id:-1}).limit(50).lean()
     .then(function(response){
-      var img = response.image.data;
-      logger.info('Image retrieved by: ' + userIP, 'GET_IMAGE')
-      Promise.resolve(img);
+      images = response;
+      return pictureModel.count()
+    })
+    .then(function(response){
+      var count = response;
+      var output = {};
+      output.info = "See list of last 50 pictures and total count."
+      output.count = count;
+      output.images = images;
+      logger.info('Images info retrieved by: ' + userIP, 'GET_IMAGES')
+      resolve(output);
     })
     .catch(function(err){
-      logger.error(error, 'GET_IMAGE');
-      Promise.reject();
+      logger.error(err, 'GET_IMAGES');
+      reject();
     });
+  });
+}
+
+exports.saveImage_multer = function(req){
+  return true;
 }
 
 // Private functions
 
 // Store image
-function storeImage(origin, payload, size, mimetype){
+function storeMetadata(origin, size, mimetype){
     // define your new document
     var newItem = {
        // description: req.body.description,
        contentType: mimetype,
        size: size,
-       data: Buffer(payload, 'base64')
+       origin: origin,
+       path: "uploads/"
     };
-    var pictureDb = new pictureModel({origin: origin, image: newItem});
+    var pictureDb = new pictureModel(newItem);
     return pictureDb.save();
   }

@@ -25,13 +25,13 @@ var api = require('./api/routes/routes');
 var app = express();
 
 // Middlewares
-app.use(cors({origin:'*'}))
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cors({origin:'*'}));
+app.use(bodyParser.urlencoded({ limit: '1mb', extended: true }));
 app.use(cookieParser());
 app.use(morgan(':status - :date[iso] - :method - :url - :response-time - :remote-addr', { "stream": logger.stream}));
 
 //** API **
-app.use('/', api);
+app.use('/api', api);
 
 // Not found request response
 app.use(function(req, res) {

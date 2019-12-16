@@ -5,6 +5,7 @@ services:
     restart: always
     volumes:
     - ./logs/server:/home/app/logs
+    - ./uploads:/home/app/uploads
     - ./server/server.config.js:/home/app/server.config.js:ro
     - ./server/index.js:/home/app/index.js:ro
     build:
