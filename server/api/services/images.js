@@ -81,7 +81,7 @@ exports.saveImage_multer = function(req, res, next){
       });
     });
   } else {
-    logger.error(err, "Missing image...");
+    logger.error("Missing image...");
     res.json({error: true, msg: "Missing image..."});
   }
 }
