@@ -19,5 +19,7 @@ module.exports = router
     res.send('Welcome to cyberlab server');
   })
   .get('/image', images.get)
+  // .get('/image/:id', images.getById)
+  .get('/image/last', images.getLastImage)
   .post('/image', images.post)
-  .post('/imageform', upload.single('picture'), images.postform);
+  .post('/imageform', upload.single('image'), images.postform);

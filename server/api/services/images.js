@@ -15,14 +15,17 @@ exports.saveImage = function (req) {
   var timestamp = new Date().getTime();
   var imagePath = config.uploadPath + timestamp + '.jpeg';
   var f = fs.createWriteStream(imagePath);
+  var img_data = [];
   return new Promise(function(resolve, reject) {
-    req.on('data', function (data) {
-        f.write(data);
+    req.on('data', function (chunk) {
+        img_data.push(chunk)
+        f.write(chunk);
     });
     req.on('end', function () {
       f.end();
+      var img = Buffer.concat(img_data);
       //*** Store Metadata in Mongo ***
-      storeMetadata(userIP, size, mimeType, imagePath)
+      storeInMongo(userIP, size, mimeType, imagePath, img)
       .then(function(response){
         logger.info("Image stored by : " + userIP, "POST_IMAGE");
         resolve({id: response._id})
@@ -35,12 +38,12 @@ exports.saveImage = function (req) {
   });
 }
 
-exports.retrieveImage = function (req){
+exports.retrieveImageMetadata = function (req){
     var logger = new Log();
     var userIP = req.socket.remoteAddress;
     var images;
     return new Promise(function(resolve, reject) {
-    pictureModel.find({}).sort({_id:-1}).limit(50).lean()
+    pictureModel.find({}).select({'file.data': 0}).sort({_id:-1}).limit(50).lean()
     .then(function(response){
       images = response;
       return pictureModel.count()
@@ -61,6 +64,20 @@ exports.retrieveImage = function (req){
   });
 }
 
+exports.getLastImage = function (req){
+  var logger = new Log();
+  return new Promise(function(resolve, reject) {
+  pictureModel.find({}).select({file: 1, _id: 0}).sort({_id:-1}).limit(1)
+  .then(function(response){
+    resolve(response[0].file.data);
+  })
+  .catch(function(err){
+    logger.error(err, 'GET_LAST_IMAGE');
+    reject();
+  });
+});
+}
+
 exports.saveImage_multer = function(req, res, next){
   var logger = new Log();
   if(req.file){
@@ -69,8 +86,9 @@ exports.saveImage_multer = function(req, res, next){
       var size = req.file.size;
       var mimeType = req.file.mimetype;
       var imagePath = config.uploadPath + req.file.originalname;
-      //*** Store Metadata in Mongo ***
-      storeMetadata(userIP, size, mimeType, imagePath)
+      var img = fs.readFileSync(imagePath);
+      //*** Store in Mongo ***
+      storeInMongo(userIP, size, mimeType, imagePath, img)
       .then(function(response){
         logger.info("Image stored by : " + userIP, "POST_IMAGE");
         resolve({id: response._id})
@@ -89,14 +107,17 @@ exports.saveImage_multer = function(req, res, next){
 // Private functions
 
 // Store image
-function storeMetadata(origin, size, mimetype, path){
+function storeInMongo(origin, size, mimetype, path, img){
     // define your new document
     var newItem = {
        // description: req.body.description,
-       contentType: mimetype,
-       size: size,
+       path: path,
        origin: origin,
-       path: path
+       file:
+        { size: size,
+          mimetype: mimetype,
+          data: Buffer(img.toString('base64'), 'base64') 
+        }
     };
     var pictureDb = new pictureModel(newItem);
     return pictureDb.save();

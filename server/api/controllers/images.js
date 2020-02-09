@@ -1,8 +1,16 @@
 var sImages = require('../services/images');
 
 exports.get = function (req, res, next) {
-  sImages.retrieveImage(req)
+  sImages.retrieveImageMetadata(req)
   .then((response)=>{res.json(response)})
+  .catch(()=>{res.send('Something went wrong, please check the logs for more info.')});  
+};
+
+exports.getLastImage = function (req, res, next) {
+  sImages.getLastImage(req)
+  .then((response)=>{
+    res.end(response);
+    })
   .catch(()=>{res.send('Something went wrong, please check the logs for more info.')});  
 };
 

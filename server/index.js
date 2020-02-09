@@ -31,8 +31,9 @@ app.use(cookieParser());
 app.use(morgan(':status - :date[iso] - :method - :url - :response-time - :remote-addr', { "stream": logger.stream}));
 
 //** API **
-app.use('/api', api);
 
+// Routes available under api/routes
+app.use('/api', api);
 // Not found request response
 app.use(function(req, res) {
   res.status(404).send({url: req.originalUrl + ' not found'});

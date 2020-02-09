@@ -1,3 +1,4 @@
+docker-compose down
 mkdir -p logs/server
 mkdir -p logs/mongo
 chmod -R 777 logs
