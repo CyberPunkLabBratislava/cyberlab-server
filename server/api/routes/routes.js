@@ -21,5 +21,6 @@ module.exports = router
   .get('/image', images.get)
   // .get('/image/:id', images.getById)
   .get('/image/last', images.getLastImage)
-  .post('/image', images.post)
+  .post('/image/parking', images.post_parking)
+  .post('/image/traffic', images.post_traffic)
   .post('/imageform', upload.single('image'), images.postform);

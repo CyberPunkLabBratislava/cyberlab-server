@@ -12,7 +12,7 @@ module.exports = {
     env_development: {
       NODE_ENV: "development",
       PORT: 3000,
-      MONGO_STRING: "mongodb://mongodb:27017/db",
+      MONGO_STRING: "mongodb://localhost:27017/db",
       AI_URL: "http://localhost:5000/",
       UPLOAD_PATH: "uploads/"
     }

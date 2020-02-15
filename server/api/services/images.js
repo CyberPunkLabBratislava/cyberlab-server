@@ -3,11 +3,12 @@
 var pictureModel = require('../../classes/models').picture;
 var fs = require('fs');
 var Log = require('../../classes/logger');
+var ai_module = require('../../util/ai');
 var config = require('../../configuration/configuration');
 
 // Public functions
 
-exports.saveImage = function (req) {
+exports.saveImage = function (req, type) {
   var logger = new Log();
   var userIP = req.socket.remoteAddress;
   var size = req.headers['content-length'];
@@ -24,8 +25,12 @@ exports.saveImage = function (req) {
     req.on('end', function () {
       f.end();
       var img = Buffer.concat(img_data);
+      //*** Call AI module */
+      ai_module.classify(img, type)
+      .then(function(response){
       //*** Store Metadata in Mongo ***
-      storeInMongo(userIP, size, mimeType, imagePath, img)
+        return storeInMongo(userIP, size, mimeType, imagePath, response);
+      })
       .then(function(response){
         logger.info("Image stored by : " + userIP, "POST_IMAGE");
         resolve({id: response._id})
@@ -46,7 +51,7 @@ exports.retrieveImageMetadata = function (req){
     pictureModel.find({}).select({'file.data': 0}).sort({_id:-1}).limit(50).lean()
     .then(function(response){
       images = response;
-      return pictureModel.count()
+      return pictureModel.countDocuments()
     })
     .then(function(response){
       var count = response;

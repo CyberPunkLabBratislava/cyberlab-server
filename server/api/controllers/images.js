@@ -14,8 +14,14 @@ exports.getLastImage = function (req, res, next) {
   .catch(()=>{res.send('Something went wrong, please check the logs for more info.')});  
 };
 
-exports.post = function (req, res, next) {
-  sImages.saveImage(req)
+exports.post_parking = function (req, res, next) {
+  sImages.saveImage(req, "classify")
+  .then((response)=>{res.json({error: false, id: response.id})})
+  .catch(()=>{res.json({error: true, message: 'Something went wrong, please check the logs for more info.'}) });  
+};
+
+exports.post_traffic = function (req, res, next) {
+  sImages.saveImage(req, "detect")
   .then((response)=>{res.json({error: false, id: response.id})})
   .catch(()=>{res.json({error: true, message: 'Something went wrong, please check the logs for more info.'}) });  
 };
