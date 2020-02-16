@@ -27,5 +27,5 @@ module.exports = router
   .post('/imageform', upload.single('image'), images.postform)
   .get('/things', things.get)
   .get('/things/:id', things.getById)
-  .post('/things', things.register)
+  .post('/things', express.json(), things.register)
   .delete('/things', things.remove); 
