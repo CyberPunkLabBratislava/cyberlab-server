@@ -1,6 +1,7 @@
 var express = require('express'),
 router = express.Router(),
 images = require('../controllers/images'),
+things = require('../controllers/things'),
 config = require('../../configuration/configuration'),
 multer = require('multer'),
 storage = multer.diskStorage({
@@ -23,4 +24,8 @@ module.exports = router
   .get('/image/last', images.getLastImage)
   .post('/image/parking', images.post_parking)
   .post('/image/traffic', images.post_traffic)
-  .post('/imageform', upload.single('image'), images.postform);
+  .post('/imageform', upload.single('image'), images.postform)
+  .get('/things', things.get)
+  .get('/things/:id', things.getById)
+  .post('/things', things.register)
+  .delete('/things', things.remove); 
