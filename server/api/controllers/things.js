@@ -20,6 +20,6 @@ exports.register = function (req, res, next) {
 
 exports.remove = function (req, res, next) {
   sThings.remove(req)
-  .then((response)=>{res.json({error: false, id: response})})
+  .then((response)=>{res.json({error: false, message: response})})
   .catch(()=>{res.json({error: true, message: 'Something went wrong, please check the logs for more info.'}) });  
 };

@@ -25,7 +25,7 @@ exports.getById = function (req) {
   return new Promise(function(resolve, reject) {
     thingOp.findOne({"thing_id": req.params.id}).lean()
     .then(function(response){
-      if(!response.thing_id){
+      if(!response){
         resolve("NOT FOUND");
       } else {
         resolve(response);
@@ -69,7 +69,19 @@ exports.register = function (req) {
 }
 
 exports.remove = function (req) {
+  var logger = new Log();
   return new Promise(function(resolve, reject) {
-    resolve("Under construction")
+    thingOp.deleteOne({"thing_id": req.params.id}).lean()
+    .then(function(response){
+      if(!response.deletedCount){
+        resolve("NOT FOUND");
+      } else {
+        resolve(req.params.id + " was deleted");
+      }
+    })
+    .catch(function(err){
+      logger.error(err, 'GET_THING_BY_ID');
+      reject();
+    });
   });
 }

@@ -28,4 +28,4 @@ module.exports = router
   .get('/things', things.get)
   .get('/things/:id', things.getById)
   .post('/things', express.json(), things.register)
-  .delete('/things', things.remove); 
+  .delete('/things/:id', things.remove); 
