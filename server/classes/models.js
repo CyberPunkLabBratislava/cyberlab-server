@@ -17,7 +17,7 @@ var thing = new Schema({
     created: { type: Date, default: Date.now },
     mode: { type: String, required: true },
     type: { type: String, required: true },
-    id: { type: String, default: uuid() }
+    thing_id: { type: String, default: uuid() }
     // mac
     // hasItems
     // authentication

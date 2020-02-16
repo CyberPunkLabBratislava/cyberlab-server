@@ -7,14 +7,34 @@ var config = require('../../configuration/configuration');
 // Public functions
 
 exports.get = function (req) {
+  var logger = new Log();
   return new Promise(function(resolve, reject) {
-    resolve("Under construction")
+    thingOp.find({}).sort({_id:-1}).limit(20).lean()
+    .then(function(response){
+      resolve(response)
+    })
+    .catch(function(err){
+      logger.error(err, 'GET_THING');
+      reject();
+    });
   });
 }
 
 exports.getById = function (req) {
+  var logger = new Log();
   return new Promise(function(resolve, reject) {
-    resolve("Under construction")
+    thingOp.findOne({"thing_id": req.params.id}).lean()
+    .then(function(response){
+      if(!response.thing_id){
+        resolve("NOT FOUND");
+      } else {
+        resolve(response);
+      }
+    })
+    .catch(function(err){
+      logger.error(err, 'GET_THING_BY_ID');
+      reject();
+    });
   });
 }
 
@@ -34,8 +54,8 @@ exports.register = function (req) {
     var thingDb = new thingOp(newThing);
     thingDb.save()
       .then(function(response){
-        logger.info("New thing registered " + response._id, "REGISTER_THING");
-        resolve(response._id)
+        logger.info("New thing registered " + response.thing_id, "REGISTER_THING");
+        resolve(response.thing_id)
       })
       .catch(function(err){
         logger.error(err, 'REGISTER_THING');
