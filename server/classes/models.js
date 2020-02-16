@@ -23,8 +23,18 @@ var thing = new Schema({
     // authentication
 });
 
+var measurement = new Schema({
+    created: { type: Date, default: Date.now },
+    mode: { type: String, required: true },
+    thing_id: { type: String, required: true },
+    data: { type: Number, required: true  }
+    // data: { [ measurement_key, measurement_value, measurement_value_type, timestamp, camera_id]}
+});
+
 picture.set('autoIndex',true);
 thing.set('autoIndex',true);
+measurement.set('autoIndex',true);
 
 module.exports.picture = mongoose.model('picture', picture);
 module.exports.thing = mongoose.model('thing', thing);
+module.exports.measurement = mongoose.model('measurement', measurement);

@@ -2,6 +2,7 @@ var express = require('express'),
 router = express.Router(),
 images = require('../controllers/images'),
 things = require('../controllers/things'),
+measurements = require('../controllers/measurements'),
 config = require('../../configuration/configuration'),
 multer = require('multer'),
 storage = multer.diskStorage({
@@ -28,4 +29,6 @@ module.exports = router
   .get('/things', things.get)
   .get('/things/:id', things.getById)
   .post('/things', express.json(), things.register)
-  .delete('/things/:id', things.remove); 
+  .delete('/things/:id', things.remove)
+  .get('/measurements', measurements.get) 
+  .post('/measurements', express.json(), measurements.insert); 
