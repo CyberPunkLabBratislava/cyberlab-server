@@ -73,7 +73,7 @@ exports.getLastImage = function (req){
   var logger = new Log();
   var offset = Number(req.query.offset);
   return new Promise(function(resolve, reject) {
-  pictureModel.find({}).select({file: 1, _id: 0}).sort({_id:-1}).offset(offset).limit(1)
+  pictureModel.find({}).select({file: 1, _id: 0}).sort({_id:-1}).skip(offset).limit(1)
   .then(function(response){
     resolve(response[0].file.data);
   })
