@@ -48,15 +48,15 @@ exports.retrieveImageMetadata = function (req){
     var userIP = req.socket.remoteAddress;
     var images;
     return new Promise(function(resolve, reject) {
-    pictureModel.find({}).select({'file.data': 0}).sort({_id:-1}).limit(50).lean()
+    pictureModel.find({}).select({'file.data': 0}).sort({_id:-1}).limit(25).lean()
     .then(function(response){
       images = response;
-      return pictureModel.countDocuments()
+      return pictureModel.estimatedDocumentCount()
     })
     .then(function(response){
       var count = response;
       var output = {};
-      output.info = "See list of last 50 pictures and total count."
+      output.info = "See list of last 25 pictures and total count."
       output.count = count;
       output.images = images;
       logger.info('Images info retrieved by: ' + userIP, 'GET_IMAGES')
@@ -71,8 +71,9 @@ exports.retrieveImageMetadata = function (req){
 
 exports.getLastImage = function (req){
   var logger = new Log();
+  var offset = Number(req.query.offset);
   return new Promise(function(resolve, reject) {
-  pictureModel.find({}).select({file: 1, _id: 0}).sort({_id:-1}).limit(1)
+  pictureModel.find({}).select({file: 1, _id: 0}).sort({_id:-1}).offset(offset).limit(1)
   .then(function(response){
     resolve(response[0].file.data);
   })
